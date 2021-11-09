@@ -27,3 +27,12 @@ angry_scraped_clean <- angry_scraped %>%
 
 angry_join <- angry_clean %>% 
   left_join(angry_scraped_clean, by = c("twitterid"="status_id"))
+
+angry_join %>% 
+  drop_na() %>% 
+  filter(annotation %in% c("negativ", "positiv")) %>% 
+  select(id, annotation, text) %>% 
+  write_csv("./output/full_dat.csv")
+
+
+full_dat <- read_csv("./output/full_dat.csv")
