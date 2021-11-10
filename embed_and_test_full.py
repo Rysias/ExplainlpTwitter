@@ -22,7 +22,7 @@ def predict_sentiment(analyzer: SentimentAnalyzer, text: List[str]) -> List[int]
 
 
 def create_emb_obj(embeddings: np.array, id_col: pd.Series) -> np.array:
-    return np.hstack(id_col.values, embeddings)
+    return np.hstack((id_col.values.reshape(-1, 1), embeddings))
 
 
 def main(args):
