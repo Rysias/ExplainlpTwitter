@@ -19,6 +19,16 @@ def find_file(path, pattern="*"):
     return next(path.glob(pattern))
 
 
+def preprocess(text):
+    new_text = []
+
+    for t in text.split(" "):
+        t = "@user" if t.startswith("@") and len(t) > 1 else t
+        t = "http" if t.startswith("http") else t
+        new_text.append(t)
+    return " ".join(new_text)
+
+
 def remove_pattern(text_col: pd.Series, pattern: str) -> pd.Series:
     return text_col.str.replace(pattern, "")
 
@@ -47,8 +57,7 @@ df = pd.read_csv(
 )
 df.columns = ["Sentiment", "id", "Date", "Query", "User", "Tweet"]
 
-df["cleantext"] = clean_textcol(df["Tweet"])
+df["cleantext"] = df["Tweet"].apply(lambda x: preprocess(x))
+df["Sentiment"] = (df["Sentiment"] / 4).astype(np.uint8)
 
-
-test_name = "@switchfoot http://twitpic.com/2y1zl - Awww"
-re.sub("https?://\w+\\.\w+/\w+", "", test_name)
+df[["id", "cleantext", "Sentiment"]].to_csv(DATA_DIR / "clean_tweets.csv")
