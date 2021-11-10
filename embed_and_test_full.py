@@ -7,11 +7,6 @@ from pysentimiento import SentimentAnalyzer
 from scipy.special import softmax
 from pathlib import Path
 
-task = "sentiment"
-MODEL = f"cardiffnlp/twitter-roberta-base-{task}"
-DATA_PATH = "./output/clean_tweets.csv"
-analyzer.predict(["I'm angry", "I'm happy https://lol.com"])
-
 
 def predict_text(model, tokenizer, text_arr: np.ndarray) -> np.ndarray:
     encoded_input = tokenizer(text_arr, padding=True, return_tensors="pt")
