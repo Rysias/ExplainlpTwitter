@@ -1,14 +1,18 @@
+from typing import List
 from transformers import AutoModelForSequenceClassification
 from transformers import AutoTokenizer
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import pandas as pd
 import argparse
+from pysentimiento import SentimentAnalyzer
 from scipy.special import softmax
+from pathlib import Path
 
 task = "sentiment"
 MODEL = f"cardiffnlp/twitter-roberta-base-{task}"
 DATA_PATH = "./output/clean_tweets.csv"
+analyzer.predict(["I'm angry", "I'm happy https://lol.com"])
 
 
 def predict_text(model, tokenizer, text_arr: np.ndarray) -> np.ndarray:
@@ -19,16 +23,30 @@ def predict_text(model, tokenizer, text_arr: np.ndarray) -> np.ndarray:
     return np.around(scores[:, 2])
 
 
+def predict_sentiment(analyzer: SentimentAnalyzer, text: List[str]) -> List[int]:
+    output = analyzer.predict(text)
+    return [int(np.around(pred.probas["POS"])) for pred in output]
+
+
+def create_emb_obj(embeddings: np.array, id_col: pd.Series) -> np.array:
+    return np.hstack(id_col.values, embeddings)
+
+
 def main(args):
     df = pd.read_csv(args.data_path)
-    tokenizer = AutoTokenizer.from_pretrained(
-        "finiteautomata/bertweet-base-sentiment-analysis"
-    )
-    # PT
-    model = AutoModelForSequenceClassification.from_pretrained(
-        "finiteautomata/bertweet-base-sentiment-analysis"
-    )
+    print("Loading models")
+    analyzer = SentimentAnalyzer(lang="en")
     sent_model = SentenceTransformer("finiteautomata/bertweet-base-sentiment-analysis")
+    print("Embedding docs")
+    docs = df["cleantext"]
+    embeddings = sent_model.encode(docs)
+    emb_obj = create_emb_obj(embeddings, docs["id"])
+    np.save(Path(args.embedding_path) / "embeddings.npy", emb_obj)
+    print("predicting sentiment")
+    preds = predict_sentiment(analyzer, docs.tolist())
+    pred_df = df[["id", "Sentiment"]].assign(pred=preds)
+    pred_df.to_csv(Path(args.embedding_path) / "big_preds.csv")
+    print("all done!")
 
 
 if __name__ == "__main__":
