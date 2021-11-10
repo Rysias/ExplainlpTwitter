@@ -1,10 +1,9 @@
 """
-Embeds the data using ÆLÆCTRA and saves it locally
+Clean the twitter data for embedding
 """
 from pathlib import Path
 import pandas as pd
 import numpy as np
-from sentence_transformers import SentenceTransformer
 
 DATA_DIR = Path("./output")
 
