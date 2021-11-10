@@ -33,7 +33,7 @@ def main(args):
     print("Embedding docs")
     docs = df["cleantext"]
     embeddings = sent_model.encode(docs, show_progress_bar=True)
-    emb_obj = create_emb_obj(embeddings, docs["id"])
+    emb_obj = create_emb_obj(embeddings, df["id"])
     np.save(Path(args.embedding_path) / "embeddings.npy", emb_obj)
     print("predicting sentiment")
     preds = predict_sentiment(analyzer, docs.tolist())
