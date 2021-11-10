@@ -32,8 +32,8 @@ angry_join <- angry_clean %>%
 angry_join %>% 
   drop_na() %>% 
   filter(annotation %in% c("negativ", "positiv")) %>% 
-  select(status_id, annotation, text) %>% 
-  write_csv("./output/full_dat.csv")
+  select(twitterid, annotation, text) %>% 
+  write_csv("./output/full_dat2.csv")
 
 
 full_dat <- read_csv("./output/full_dat.csv")
