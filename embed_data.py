@@ -7,7 +7,19 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 
 DATA_DIR = Path("./output")
-df = pd.read_csv(DATA_DIR / "full_tweets.csv")
+
+
+def find_file(path, pattern="*"):
+    return next(path.glob(pattern))
+
+
+df = pd.read_csv(
+    find_file(DATA_DIR, pattern="*training*"), encoding="latin-1", header=None
+)
+df.columns = ["Sentiment", "id", "Date", "Query", "User", "Tweet"]
+
+
+df = pd.read_csv(find_file(DATA_DIR, "*training*"))
 df.head()
 model = SentenceTransformer("Maltehb/-l-ctra-danish-electra-small-cased")
 embs = model.encode(df["text"])
