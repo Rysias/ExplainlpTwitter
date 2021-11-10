@@ -25,13 +25,14 @@ angry_scraped <- lookup_statuses(angry_raw$twitterid)
 angry_scraped_clean <- angry_scraped %>% 
   select(status_id, created_at, screen_name, text, favorite_count, retweet_count)
 
+write_csv(angry_scraped_clean, "./output/full_tweets.csv")
 angry_join <- angry_clean %>% 
   left_join(angry_scraped_clean, by = c("twitterid"="status_id"))
 
 angry_join %>% 
   drop_na() %>% 
   filter(annotation %in% c("negativ", "positiv")) %>% 
-  select(id, annotation, text) %>% 
+  select(status_id, annotation, text) %>% 
   write_csv("./output/full_dat.csv")
 
 
