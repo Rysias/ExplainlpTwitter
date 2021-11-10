@@ -1,6 +1,4 @@
 from typing import List
-from transformers import AutoModelForSequenceClassification
-from transformers import AutoTokenizer
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import pandas as pd
