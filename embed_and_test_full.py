@@ -32,7 +32,7 @@ def main(args):
     sent_model = SentenceTransformer("finiteautomata/bertweet-base-sentiment-analysis")
     print("Embedding docs")
     docs = df["cleantext"]
-    embeddings = sent_model.encode(docs, show_progress_bar=True)
+    embeddings = sent_model.encode(docs, show_progress_bar=True, batch_size=128)
     emb_obj = create_emb_obj(embeddings, df["id"])
     np.save(Path(args.embedding_path) / "embeddings.npy", emb_obj)
     print("predicting sentiment")
