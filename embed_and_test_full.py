@@ -32,7 +32,7 @@ def main(args):
     sent_model = SentenceTransformer("finiteautomata/bertweet-base-sentiment-analysis")
     print("Embedding docs")
     docs = df["cleantext"]
-    embeddings = sent_model.encode(docs)
+    embeddings = sent_model.encode(docs, show_progress_bar=True)
     emb_obj = create_emb_obj(embeddings, docs["id"])
     np.save(Path(args.embedding_path) / "embeddings.npy", emb_obj)
     print("predicting sentiment")
@@ -45,7 +45,7 @@ def main(args):
 if __name__ == "__main__":
     my_parser = argparse.ArgumentParser(description="Embed Documents")
     my_parser.add_argument(
-        "--data_path", type=str, help="Gives the path to the data file (a pickle)"
+        "--data_path", type=str, help="Gives the path to the data file (a csv)"
     )
     my_parser.add_argument(
         "-emb",
