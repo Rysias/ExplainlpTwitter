@@ -29,7 +29,7 @@ def main(args):
     docs = load_docs(args.data_path)
     embeddings = load_embeds(args.embedding_path)
     np.random.seed(0)
-    sample_idx = get_random_idx(docs["cleantext"])
+    sample_idx = get_random_idx(docs)
     small_docs = docs[sample_idx]
     small_embs = embeddings[sample_idx]
     print("bootin model...")
