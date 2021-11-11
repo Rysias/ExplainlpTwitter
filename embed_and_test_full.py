@@ -29,12 +29,16 @@ def main(args):
     df = pd.read_csv(args.data_path)
     print("Loading models")
     analyzer = SentimentAnalyzer(lang="en")
-    sent_model = SentenceTransformer("finiteautomata/bertweet-base-sentiment-analysis")
-    print("Embedding docs")
     docs = df["cleantext"]
-    embeddings = sent_model.encode(docs, show_progress_bar=True, batch_size=128)
-    emb_obj = create_emb_obj(embeddings, df["id"])
-    np.save(Path(args.embedding_path) / "embeddings.npy", emb_obj)
+    embedding_output = Path(args.embedding_path) / "embeddings.npy"
+    if not embedding_output.exists():
+        print("Embedding docs")
+        sent_model = SentenceTransformer(
+            "finiteautomata/bertweet-base-sentiment-analysis"
+        )
+        embeddings = sent_model.encode(docs, show_progress_bar=True, batch_size=128)
+        emb_obj = create_emb_obj(embeddings, df["id"])
+        np.save(Path(args.embedding_path) / "embeddings.npy", emb_obj)
     print("predicting sentiment")
     preds = predict_sentiment(analyzer, docs.tolist())
     pred_df = df[["id", "Sentiment"]].assign(pred=preds)
