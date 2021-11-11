@@ -28,7 +28,10 @@ def main(args):
     )
 
     topic_model = BERTopic(
-        nr_topics=10, low_memory=True, vectorizer_model=vectorizer_model, verbose=True
+        low_memory=True,
+        vectorizer_model=vectorizer_model,
+        verbose=True,
+        calculate_probabilities=False,
     )
     print("fittin model...")
     topics, probs = topic_model.fit_transform(docs, embeddings)
