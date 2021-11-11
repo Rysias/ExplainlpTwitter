@@ -20,7 +20,7 @@ def load_embeds(embed_path: Union[str, Path]):
 def main(args):
     print("loadin data...")
     docs = load_docs(args.data_path)
-    embeddings = load_embeds(args.embed_path)
+    embeddings = load_embeds(args.embedding_path)
     print("bootin model...")
     topic_model = BERTopic(nr_topics=10)
     print("fittin model...")
