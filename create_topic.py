@@ -18,15 +18,24 @@ def load_embeds(embed_path: Union[str, Path]):
     return raw_embeds[:, 1:]
 
 
+def get_random_idx(col: Union[pd.Series, np.array], sample_frac=0.2) -> np.array:
+    all_idx = np.arange(len(col))
+    sample_size = int(len(col) * sample_frac)
+    return np.random.choice(all_idx, size=sample_size, replace=False)
+
+
 def main(args):
     print("loadin data...")
     docs = load_docs(args.data_path)
     embeddings = load_embeds(args.embedding_path)
+    np.random.seed(0)
+    sample_idx = get_random_idx(docs["cleantext"])
+    small_docs = docs[sample_idx]
+    small_embs = embeddings[sample_idx]
     print("bootin model...")
     vectorizer_model = CountVectorizer(
         ngram_range=(1, 2), stop_words="english", min_df=100
     )
-
     topic_model = BERTopic(
         low_memory=True,
         vectorizer_model=vectorizer_model,
@@ -34,10 +43,10 @@ def main(args):
         calculate_probabilities=False,
     )
     print("fittin model...")
-    topics, probs = topic_model.fit_transform(docs, embeddings)
+    topics, probs = topic_model.fit_transform(small_docs, small_embs)
     print("savin data...")
     preds_df = pd.DataFrame(
-        list(zip(topics, probs, docs)), columns=["topic", "prob", "doc"]
+        list(zip(topics, probs, small_docs)), columns=["topic", "prob", "doc"]
     )
     preds_df.to_csv(Path(args.save_path) / "doc_topics.csv", index=False)
     print("savin model...")
