@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import argparse
 from bertopic import BERTopic
+from sklearn.feature_extraction.text import CountVectorizer
 
 
 def load_docs(data_path: Union[str, Path], text_col="cleantext") -> np.ndarray:
@@ -22,7 +23,13 @@ def main(args):
     docs = load_docs(args.data_path)
     embeddings = load_embeds(args.embedding_path)
     print("bootin model...")
-    topic_model = BERTopic(nr_topics=10)
+    vectorizer_model = CountVectorizer(
+        ngram_range=(1, 2), stop_words="english", min_df=100
+    )
+
+    topic_model = BERTopic(
+        nr_topics=10, low_memory=True, vectorizer_model=vectorizer_model, verbose=True
+    )
     print("fittin model...")
     topics, probs = topic_model.fit_transform(docs, embeddings)
     print("savin data...")
