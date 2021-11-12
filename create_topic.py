@@ -18,9 +18,12 @@ def load_embeds(embed_path: Union[str, Path]):
     return raw_embeds[:, 1:]
 
 
-def get_random_idx(col: Union[pd.Series, np.array], sample_frac=0.1) -> np.array:
+def get_random_idx(
+    col: Union[pd.Series, np.array], sample_size: Union[int, float] = 0.1
+) -> np.array:
     all_idx = np.arange(len(col))
-    sample_size = int(len(col) * sample_frac)
+    if sample_size < 1:
+        sample_size = int(len(col) * sample_size)
     return np.random.choice(all_idx, size=sample_size, replace=False)
 
 
@@ -29,7 +32,7 @@ def main(args):
     docs = load_docs(args.data_path)
     embeddings = load_embeds(args.embedding_path)
     np.random.seed(0)
-    sample_idx = get_random_idx(docs)
+    sample_idx = get_random_idx(docs, sample_size=args.data_size)
     small_docs = docs[sample_idx]
     small_embs = embeddings[sample_idx]
     print("bootin model...")
@@ -70,6 +73,11 @@ if __name__ == "__main__":
         "--save_path",
         type=str,
         help="Path to directory to save stuff",
+    )
+    my_parser.add_argument(
+        "--data_size",
+        type=float,
+        help="Size of the data to use (100k seems to be a hard limit)",
     )
     args = my_parser.parse_args()
     main(args)
