@@ -18,7 +18,7 @@ def load_embeds(embed_path: Union[str, Path]):
     return raw_embeds[:, 1:]
 
 
-def get_random_idx(col: Union[pd.Series, np.array], sample_frac=0.2) -> np.array:
+def get_random_idx(col: Union[pd.Series, np.array], sample_frac=0.1) -> np.array:
     all_idx = np.arange(len(col))
     sample_size = int(len(col) * sample_frac)
     return np.random.choice(all_idx, size=sample_size, replace=False)
