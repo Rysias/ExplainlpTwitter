@@ -24,7 +24,7 @@ def get_random_idx(
     all_idx = np.arange(len(col))
     if sample_size < 1:
         sample_size = int(len(col) * sample_size)
-    return np.random.choice(all_idx, size=sample_size, replace=False)
+    return np.random.choice(all_idx, size=int(sample_size), replace=False)
 
 
 def main(args):
