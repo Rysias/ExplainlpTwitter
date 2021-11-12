@@ -51,7 +51,7 @@ def main(args):
     preds_df.to_csv(Path(args.save_path) / "doc_topics.csv", index=False)
     print("savin model...")
     topic_model.save(
-        str(Path(args.save_path) / "topic_model"), save_embedding_model=False
+        str((Path(args.save_path) / "topic_model")), save_embedding_model=False
     )
     print("all done!")
 
