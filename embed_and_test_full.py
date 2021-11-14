@@ -38,11 +38,13 @@ def main(args):
         )
         embeddings = sent_model.encode(docs, show_progress_bar=True, batch_size=128)
         emb_obj = create_emb_obj(embeddings, df["id"])
-        np.save(Path(args.embedding_path) / "embeddings.npy", emb_obj)
-    print("predicting sentiment")
-    preds = predict_sentiment(analyzer, docs.tolist())
-    pred_df = df[["id", "Sentiment"]].assign(pred=preds)
-    pred_df.to_csv(Path(args.embedding_path) / "big_preds.csv")
+        np.save(embedding_output, emb_obj)
+    pred_output = Path(args.embedding_path) / "big_preds.csv"
+    if not pred_output.exists():
+        print("predicting sentiment")
+        preds = predict_sentiment(analyzer, docs.tolist())
+        pred_df = df[["id", "Sentiment"]].assign(pred=preds)
+        pred_df.to_csv(pred_output)
     print("all done!")
 
 
