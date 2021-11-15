@@ -18,8 +18,14 @@ topic_embedder = ClearSearch(
 
 # Reducing topics
 df = pd.read_csv(DATA_DIR / "doc_topics.csv")
-embeddings = np.load(DATA_DIR / "embeddings.npy")
+embeddings = np.load(DATA_DIR / "small_embs.npy")
 idxs = df["topic"] != -1
+topics = df.loc[idxs, "topic"]
+probs = df.loc[idxs, "prob"]
+embs = embeddings[idxs, 1:]
 
+centroids = topic_embedder.calculate_centroids(topics, probs, embeddings)
 
-topic_embedder.calculate_centroids()
+# Transforming all the models!
+emb_list = [emb for emb in embeddings]
+new_features = topic_embedder.transform_many(emb_list)
