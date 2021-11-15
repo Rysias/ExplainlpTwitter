@@ -44,6 +44,8 @@ def main(args):
         vectorizer_model=vectorizer_model,
         verbose=True,
         calculate_probabilities=False,
+        min_topic_size=500,
+        nr_topics=10,
     )
     print("fittin model...")
     topics, probs = topic_model.fit_transform(small_docs, small_embs)
@@ -52,6 +54,7 @@ def main(args):
         list(zip(topics, probs, small_docs)), columns=["topic", "prob", "doc"]
     )
     preds_df.to_csv(Path(args.save_path) / "doc_topics.csv", index=False)
+    np.save(Path(args.save_path) / "small_embs.npy", small_embs)
     print("savin model...")
     topic_model.save(
         str((Path(args.save_path) / "topic_model")), save_embedding_model=False
