@@ -44,7 +44,6 @@ def main(args):
         vectorizer_model=vectorizer_model,
         verbose=True,
         calculate_probabilities=False,
-        min_topic_size=500,
         nr_topics=10,
     )
     print("fittin model...")
