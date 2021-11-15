@@ -24,8 +24,13 @@ topics = df.loc[idxs, "topic"]
 probs = df.loc[idxs, "prob"]
 embs = embeddings[idxs, 1:]
 
-centroids = topic_embedder.calculate_centroids(topics, probs, embeddings)
+centroids = topic_embedder.calculate_centroids(topics, probs, embeddings[idxs, :])
 
-# Transforming all the models!
-emb_list = [emb for emb in embeddings]
-new_features = topic_embedder.transform_many(emb_list)
+# Transforming all the tweets!
+all_embs = np.load(DATA_DIR / "embeddings.npy")
+new_features = topic_embedder.transform_many(all_embs[:, 1:])
+
+feat_with_id = np.hstack((all_embs[:, 0].reshape(-1, 1), new_features))
+
+# Write to disk
+np.save(DATA_DIR / "topic_embs.npy", feat_with_id)
