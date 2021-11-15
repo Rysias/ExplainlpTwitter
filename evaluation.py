@@ -27,5 +27,8 @@ big_preds = pd.read_csv(OUTPUT_DIR / "big_preds.csv")
 y_true = big_preds["Sentiment"]
 y_pred = big_preds["pred"]
 
+# Evaluating my model
+topic_preds = pd.read_csv(OUTPUT_DIR / "topic_preds.csv")
+topic_y_true = topic_preds["y_true"]
 
-evaluate_preds(y_true, y_pred, EVAL_DICT)
+W
