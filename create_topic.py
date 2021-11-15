@@ -37,7 +37,7 @@ def main(args):
     small_embs = embeddings[sample_idx]
     print("bootin model...")
     vectorizer_model = CountVectorizer(
-        ngram_range=(1, 2), stop_words="english", min_df=100
+        ngram_range=(1, 2), stop_words="english", min_df=10
     )
     topic_model = BERTopic(
         low_memory=True,
