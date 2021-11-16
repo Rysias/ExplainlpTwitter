@@ -1,0 +1,27 @@
+---
+title: "Result plot"
+author: "Jonathan Rystrøm"
+date: "16/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+pacman::p_load(tidyverse)
+```
+### Loading data
+```{r}
+results <- read_csv("./output/model_results.csv")
+```
+## Plot the results nicely
+```{r}
+results %>% 
+  ggplot(aes(x=num_params, y=f1, color=model)) + 
+  geom_point(size=5) + 
+  ylim(0.5, 1) + 
+  theme_minimal()
+```
+

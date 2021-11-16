@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from sklearn import metrics
+from sentence_transformers import SentenceTransformer
 
 OUTPUT_DIR = Path("./output/")
 EVAL_DICT = {
@@ -35,6 +36,19 @@ y_true = small_preds["Sentiment"]
 y_pred = small_preds["pred"]
 
 print("Evaluation of topic model")
-evaluate_preds(topic_preds["y_true"], topic_preds["y_pred"], EVAL_DICT)
+topic_results = evaluate_preds(topic_preds["y_true"], topic_preds["y_pred"], EVAL_DICT)
 print("Evaluation of big model")
-evaluate_preds(y_true, y_pred, EVAL_DICT)
+bert_results = evaluate_preds(y_true, y_pred, EVAL_DICT)
+
+
+# Count number of parameters
+model = SentenceTransformer("finiteautomata/bertweet-base-sentiment-analysis")
+total_num = sum(p.numel() for p in model.parameters())
+
+# Saving results
+bert_df = pd.DataFrame(bert_results, index=[0]).assign(
+    model="bertweet", num_params=total_num
+)
+topic_df = pd.DataFrame(topic_results, index=[1]).assign(model="topic", num_params=10)
+all_results = pd.concat((bert_df, topic_df))
+all_results.to_csv(OUTPUT_DIR / "model_results.csv")
