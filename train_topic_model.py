@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import normalize
 
 DATA_DIR = Path("./output")
 
@@ -22,8 +23,9 @@ X_train, X_test, Y_train, Y_test = train_test_split(
 )
 
 model = LogisticRegression()
-model.fit(X_train[:, 1:], Y_train)
-y_preds = model.predict(X_test[:, 1:])
+X_train_norm = normalize(X_train[:, 1:])
+model.fit(X_train_norm, Y_train)
+y_preds = model.predict(normalize(X_test[:, 1:]))
 test_ids = pd.Series(np.rint(X_test[:, 0])).astype(np.uint64).astype(str)
 pd.DataFrame({"id": test_ids, "y_true": Y_test, "y_pred": y_preds}).to_csv(
     DATA_DIR / "topic_preds.csv", index=False
