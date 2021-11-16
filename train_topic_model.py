@@ -6,6 +6,11 @@ from sklearn.linear_model import LogisticRegression
 
 DATA_DIR = Path("./output")
 
+
+def logodds_to_probs(coefs):
+    return [np.round(np.exp(x) / (1 + np.exp(x)), 5) for x in coefs[0]]
+
+
 all_embs = np.load(DATA_DIR / "topic_embs.npy")
 train_df = pd.read_csv(DATA_DIR / "clean_tweets.csv")
 train_df.head()
@@ -23,3 +28,5 @@ test_ids = pd.Series(np.rint(X_test[:, 0])).astype(np.uint64).astype(str)
 pd.DataFrame({"id": test_ids, "y_true": Y_test, "y_pred": y_preds}).to_csv(
     DATA_DIR / "topic_preds.csv", index=False
 )
+
+logodds_to_probs(model.coef_)
