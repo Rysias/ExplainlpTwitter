@@ -34,3 +34,32 @@ feat_with_id = np.hstack((all_embs[:, 0].reshape(-1, 1), new_features))
 
 # Write to disk
 np.save(DATA_DIR / "topic_embs.npy", feat_with_id)
+
+# Explore the topics #
+# Explore topic words
+topic_dict = {
+    top: [word[0] for word in words]
+    for top, words in topic_model.get_topics().items()
+    if top != -1
+}
+print(topic_dict)
+
+# Explore example tweets
+for top in topic_dict.keys():
+    print(f"examples for topic {top}")
+    example_tweets = df.loc[df["topic"] == top, "doc"].sample(10).tolist()
+    print(example_tweets)
+
+# Names to topic (manually)
+topic_names = {
+    0: "Popular media",
+    1: "Local talk",
+    2: "Media",
+    3: "User small talk",
+    4: "Social experiences",
+    5: "Wishes and dreams",
+    6: "Negative feelings",
+    7: "Expressing Feelings",
+    8: "User encouragment",
+    9: "User greetings",
+}
