@@ -22,13 +22,19 @@ def evaluate_preds(
     return {metric: func(y_true, y_pred) for metric, func in eval_dict.items()}
 
 
-# Evaluating sentiment
-big_preds = pd.read_csv(OUTPUT_DIR / "big_preds.csv")
-y_true = big_preds["Sentiment"]
-y_pred = big_preds["pred"]
-
 # Evaluating my model
 topic_preds = pd.read_csv(OUTPUT_DIR / "topic_preds.csv")
 topic_y_true = topic_preds["y_true"]
 
-W
+# Evaluating sentiment on same data!
+big_preds = pd.read_csv(OUTPUT_DIR / "big_preds.csv")
+big_preds["id"] = big_preds["id"].astype(np.uint64)
+small_preds = big_preds[big_preds["id"].isin(topic_preds["id"])]
+
+y_true = small_preds["Sentiment"]
+y_pred = small_preds["pred"]
+
+print("Evaluation of topic model")
+evaluate_preds(topic_preds["y_true"], topic_preds["y_pred"], EVAL_DICT)
+print("Evaluation of big model")
+evaluate_preds(y_true, y_pred, EVAL_DICT)
