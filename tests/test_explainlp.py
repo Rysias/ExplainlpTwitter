@@ -50,6 +50,15 @@ def model(topic_model):
     )
 
 
+@pytest.fixture(scope="session")
+def clearsifier(topic_model, topics, embeddings, probs):
+    clf = Clearsifier(
+        topic_model=topic_model,
+    )
+    clf.calculate_centroids(topics, probs, embeddings)
+    return clf
+
+
 def test_topic_model_created(model):
     assert model.topic_model is not None
 
@@ -96,14 +105,14 @@ def test_get_topic_dict(model):
     assert len(real_topics) == model.nr_topics
 
 
-def test_init_clearsifier(topic_model):
-    clearsifier = Clearsifier(topic_model=topic_model)
-
-
-def test_transform_clearsify(topic_model, embeddings, topics, probs):
+def test_transform_clearsify(clearsifier, embeddings):
     """Transforms the embeddings"""
-    clearsifier = Clearsifier(topic_model=topic_model)
-    clearsifier.calculate_centroids(topics, probs, embeddings)
     X = clearsifier.transform_many(embeddings)
     Y = np.array(25 * [0] + 25 * [1])
     clearsifier.fit(X, Y)
+
+
+def test_predict_new_data(clearsifier, embeddings):
+    preds = clearsifier.predict(embeddings)
+    assert isinstance(preds, np.ndarray)
+    assert preds.shape == (50,)
