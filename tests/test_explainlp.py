@@ -98,3 +98,12 @@ def test_get_topic_dict(model):
 
 def test_init_clearsifier(topic_model):
     clearsifier = Clearsifier(topic_model=topic_model)
+
+
+def test_transform_clearsify(topic_model, embeddings, topics, probs):
+    """Transforms the embeddings"""
+    clearsifier = Clearsifier(topic_model=topic_model)
+    clearsifier.calculate_centroids(topics, probs, embeddings)
+    X = clearsifier.transform_many(embeddings)
+    Y = np.array(25 * [0] + 25 * [1])
+    clearsifier.fit(X, Y)
