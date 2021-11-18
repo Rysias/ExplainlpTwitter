@@ -5,6 +5,7 @@ from pathlib import Path
 from bertopic import BERTopic
 from explainlp.explainlp import ClearSearch
 from explainlp.clearsify import Clearsifier
+from explainlp.clearformer import Clearformer
 
 
 def read_pickle(file_path):
@@ -61,6 +62,14 @@ def clearsifier(topic_model, topics, embeddings, probs):
 
 def test_topic_model_created(model):
     assert model.topic_model is not None
+
+
+def test_clearformer_simple_transform(topic_model, embeddings, topics, probs):
+    X = np.hstack((topics[:, np.newaxis], probs[:, np.newaxis], embeddings))
+    clearformer = Clearformer(topic_model)
+    clearformer.fit(X)
+    topx = clearformer.transform(X)
+    assert topx.shape == (50, 5)
 
 
 def test_create_centroids(model, topics, probs, embeddings):

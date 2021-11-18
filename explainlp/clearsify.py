@@ -2,6 +2,9 @@
 Extension of clearsearch for a classifier
 """
 from typing import Dict
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.container import BarContainer
 from explainlp.explainlp import ClearSearch
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import Normalizer
@@ -32,3 +35,13 @@ class Clearsifier(ClearSearch):
     def predict(self, X):
         X_new = self.transform_many(X)
         return self.clf.predict(X_new)
+
+    def plot_explain(self, X: np.ndarray) -> BarContainer:
+        """plot the prediction in matrix form"""
+        return BarContainer
+
+    def manual_pred(self, X: np.ndarray):
+        """does manual predictions"""
+        coefs = self.clf.named_steps["logisticregression"].coef_
+
+        return np.ndarray

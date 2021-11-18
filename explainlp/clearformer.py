@@ -1,27 +1,33 @@
 import numpy as np
 from bertopic import BERTopic
-from pathlib import Path
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics.pairwise import cosine_similarity
-from typing import Dict, Iterable, Optional, Union, List, Sequence
+from typing import Union, Sequence, Iterable, Dict, List
 
 
-class ClearSearch:
-    def __init__(
-        self,
-        topic_model: Union[BERTopic, str, Path],
-    ) -> None:
-
-        self.topic_model = self._load_topic_model(topic_model)
+class Clearformer(BaseEstimator, TransformerMixin):
+    def __init__(self, topic_model: BERTopic) -> None:
+        self.topic_model = topic_model
         self.nr_topics = self.topic_model.nr_topics
 
-    @staticmethod
-    def _load_topic_model(topic_model: Union[BERTopic, str, Path]):
-        if isinstance(topic_model, BERTopic):
-            return topic_model
-        else:
-            return BERTopic.load(str(topic_model))
+    def fit(self, X: np.ndarray):
+        """Fits the centroids to the data
+        X should have the following cols:
+            0: topic_num
+            1: probs
+            2-n: embeddings
+        """
+        topics = X[:, 0]
+        probs = X[:, 1]
+        embeddings = X[:, 2:]
 
-    def transform(self, embeddings: np.ndarray) -> np.ndarray:
+        self.centroids = np.zeros(
+            (self.nr_topics, embeddings.shape[1])
+        )  # Centroids need dimensions (number of topics, embedding-dimensionality)
+        for i in range(self.nr_topics):
+            self.centroids[i, :] += self._find_centroid(embeddings, topics, probs, i)
+
+    def transform_row(self, embeddings: np.ndarray) -> np.ndarray:
         """Transforms one document (with potentially multiple paragraphs) into features
         args:
             embeddings: np.ndarray (n_paragraphs, embedding_size)
@@ -41,32 +47,18 @@ class ClearSearch:
             else:
                 raise e
 
-    def transform_many(
-        self, doc_embeddings: Union[Sequence[np.ndarray], np.ndarray]
-    ) -> np.ndarray:
+    def transform(self, X: np.ndarray) -> np.ndarray:
         """
         featurizes multiple documents where each document is a numpy array of shape (n_paragraphs, embedding_dim)
         Also works if input is a (n_docs, embedding_dim) numpy array
         """
-        if type(doc_embeddings) == np.ndarray:
-            print("numpy array!")
-            return cosine_similarity(doc_embeddings, self.centroids)
-        transformed_embeddings = np.zeros((len(doc_embeddings), self.nr_topics))
-        for i, embeddings in enumerate(doc_embeddings):
-            transformed_embeddings[i, :] += self.transform(embeddings)
-        return transformed_embeddings
-
-    def get_topics(self) -> Dict[int, List[str]]:
-        raw_topics = self.topic_model.get_topics()
-        return {
-            k: [topic[0] for topic in topics]
-            for k, topics in raw_topics.items()
-            if k != -1
-        }
-
-    def _get_topic_range(self, topics: Iterable[int]) -> List[int]:
-        max_topic = max(topics)
-        return list(range(max_topic + 1))
+        try:
+            return cosine_similarity(X, self.centroids)
+        except ValueError as e:
+            if "Incompatible dimension" in str(e):
+                return cosine_similarity(X[:, 2:], self.centroids)
+            else:
+                raise
 
     def calculate_centroids(
         self, topics: np.ndarray, probs: np.ndarray, embeddings: np.ndarray
