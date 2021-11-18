@@ -60,15 +60,26 @@ def clearsifier(topic_model, topics, embeddings, probs):
     return clf
 
 
+@pytest.fixture(scope="session")
+def clearformer(topic_model, topics, embeddings, probs):
+    X = np.hstack((topics[:, np.newaxis], probs[:, np.newaxis], embeddings))
+    clearformer = Clearformer(topic_model)
+    clearformer.fit(X)
+    return clearformer
+
+
 def test_topic_model_created(model):
     assert model.topic_model is not None
 
 
-def test_clearformer_simple_transform(topic_model, embeddings, topics, probs):
+def test_clearformer_train_transform(clearformer, embeddings, topics, probs):
     X = np.hstack((topics[:, np.newaxis], probs[:, np.newaxis], embeddings))
-    clearformer = Clearformer(topic_model)
-    clearformer.fit(X)
     topx = clearformer.transform(X)
+    assert topx.shape == (50, 5)
+
+
+def test_clearformer_simple_transform(clearformer, embeddings):
+    topx = clearformer.transform(embeddings)
     assert topx.shape == (50, 5)
 
 

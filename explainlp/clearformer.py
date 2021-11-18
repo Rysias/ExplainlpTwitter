@@ -56,7 +56,8 @@ class Clearformer(BaseEstimator, TransformerMixin):
             return cosine_similarity(X, self.centroids)
         except ValueError as e:
             if "Incompatible dimension" in str(e):
-                return cosine_similarity(X[:, 2:], self.centroids)
+                new_X = X[:, 2:]
+                return self.transform(new_X)
             else:
                 raise
 
