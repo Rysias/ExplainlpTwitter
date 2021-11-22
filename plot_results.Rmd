@@ -24,4 +24,14 @@ results %>%
   ylim(0.5, 1) + 
   theme_minimal()
 ```
+### Mock-up data for presentation
+```{r}
+dat <- tibble(topic=c("politics", "news", "sports", "climate", "science"), vals = c(0.8, 0.75, 0.7, 0.1, 0.1))
+
+ggplot(dat, aes(x=topic, y=vals)) + 
+  geom_col(fill="darkgreen") + 
+  theme_minimal() + 
+  coord_flip() + 
+  labs(x=NULL, y="Topic Score")
+```
 
