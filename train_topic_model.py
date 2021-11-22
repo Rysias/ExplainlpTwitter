@@ -25,7 +25,7 @@ def main(args):
     )
 
     normalizer = Normalizer()
-    model = LogisticRegression(solver="liblinear")
+    model = LogisticRegression(solver="liblinear", max_iter=200)
     grid = {"C": np.logspace(-3, 3, 7), "penalty": ["l1", "l2"]}  # l1 lasso l2 ridge
     gridsearch = GridSearchCV(model, param_grid=grid, cv=3, verbose=True, n_jobs=-1)
     pipeline = make_pipeline(normalizer, gridsearch, verbose=True)
