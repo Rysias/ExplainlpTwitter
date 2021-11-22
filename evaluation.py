@@ -23,9 +23,11 @@ def evaluate_preds(
     return {metric: func(y_true, y_pred) for metric, func in eval_dict.items()}
 
 
+# Evaluating tf-idf
+tfidf_preds = pd.read_csv(OUTPUT_DIR / "tf_idf_preds.csv")
+
 # Evaluating my model
 topic_preds = pd.read_csv(OUTPUT_DIR / "topic_preds.csv")
-topic_y_true = topic_preds["y_true"]
 
 # Evaluating sentiment on same data!
 big_preds = pd.read_csv(OUTPUT_DIR / "big_preds.csv")
@@ -39,6 +41,8 @@ print("Evaluation of topic model")
 topic_results = evaluate_preds(topic_preds["y_true"], topic_preds["y_pred"], EVAL_DICT)
 print("Evaluation of big model")
 bert_results = evaluate_preds(y_true, y_pred, EVAL_DICT)
+print("Evaluation of tf-idf")
+tf_idf_results = evaluate_preds(tfidf_preds["y_true"], tfidf_preds["preds"], EVAL_DICT)
 
 
 # Count number of parameters
@@ -50,5 +54,8 @@ bert_df = pd.DataFrame(bert_results, index=[0]).assign(
     model="bertweet", num_params=total_num
 )
 topic_df = pd.DataFrame(topic_results, index=[1]).assign(model="topic", num_params=10)
-all_results = pd.concat((bert_df, topic_df))
+tf_idf_df = pd.DataFrame(tf_idf_results, index=[2]).assign(
+    model="tf-idf", num_params=2000
+)
+all_results = pd.concat((bert_df, topic_df, tf_idf_df))
 all_results.to_csv(OUTPUT_DIR / "model_results.csv")
