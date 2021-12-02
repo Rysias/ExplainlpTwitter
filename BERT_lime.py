@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+import dill
 from pathlib import Path
 from pysentimiento import create_analyzer
 from lime.lime_text import LimeTextExplainer
