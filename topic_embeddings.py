@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from bertopic import BERTopic
-from explainlp.explainlp import ClearSearch
+from explainlp.clearformer import Clearformer
 
 
 TOPIC_PATH = Path("./output/topic_model")
@@ -12,9 +12,16 @@ TOPIC_PATH.exists()
 topic_model = BERTopic.load(
     str(TOPIC_PATH), embedding_model="finiteautomata/bertweet-base-sentiment-analysis"
 )
-topic_embedder = ClearSearch(
-    "finiteautomata/bertweet-base-sentiment-analysis", topic_model=topic_model
-)
+topic_embedder = Clearformer(topic_model)
+
+# Transform stuff
+full_embs = np.load(DATA_DIR / "embeddings.npy")
+all_docs = pd.read_csv(DATA_DIR / "clean_tweets.csv", usecols=["cleantext"])[
+    "cleantext"
+]
+embs_no_idx = full_embs[:, 1:]
+topics, probs = topic_model.transform(documents=all_docs, embeddings=embs_no_idx)
+
 
 # Reducing topics
 df = pd.read_csv(DATA_DIR / "doc_topics.csv")
