@@ -6,6 +6,12 @@ import pandas as pd
 import argparse
 from bertopic import BERTopic
 from sklearn.feature_extraction.text import CountVectorizer
+import torch.cuda as cuda
+
+if cuda.is_available():
+    from cuml.manifold.umap import UMAP
+else:
+    from umap import UMAP
 
 
 def load_docs(data_path: Union[str, Path], text_col="cleantext") -> np.ndarray:
@@ -39,8 +45,11 @@ def main(args):
     vectorizer_model = CountVectorizer(
         ngram_range=(1, 2), stop_words="english", min_df=10
     )
+    umap_model = UMAP(n_neighbors=15, n_components=5, min_dist=0.0)
+
     topic_model = BERTopic(
         low_memory=True,
+        umap_model=umap_model,
         vectorizer_model=vectorizer_model,
         verbose=True,
         calculate_probabilities=False,
@@ -67,14 +76,10 @@ if __name__ == "__main__":
         "--data_path", type=str, help="Gives the path to the data file (a csv)"
     )
     my_parser.add_argument(
-        "--embedding_path",
-        type=str,
-        help="Gives the path to the embeddings (.npy)",
+        "--embedding_path", type=str, help="Gives the path to the embeddings (.npy)",
     )
     my_parser.add_argument(
-        "--save_path",
-        type=str,
-        help="Path to directory to save stuff",
+        "--save_path", type=str, help="Path to directory to save stuff",
     )
     my_parser.add_argument(
         "--data_size",
