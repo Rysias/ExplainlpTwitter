@@ -42,9 +42,7 @@ def main(args):
     small_docs = docs[sample_idx]
     small_embs = embeddings[sample_idx]
     print("bootin model...")
-    vectorizer_model = CountVectorizer(
-        ngram_range=(1, 2), stop_words="english", min_df=10
-    )
+    vectorizer_model = CountVectorizer(ngram_range=(1, 2), stop_words="english",)
     umap_model = UMAP(n_neighbors=15, n_components=5, min_dist=0.0)
 
     topic_model = BERTopic(
